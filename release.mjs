@@ -62,5 +62,13 @@ run(`git commit -am "Release v${version}"`);
 run(`git tag -a v${version} -m "v${version}"`);
 run(`git push origin main v${version}`);
 
+// The repo description leads with the version; keep it honest. Best effort:
+// a missing gh must never fail a release.
+try {
+  const { listChecks } = await import('./dist/battery.js');
+  const description = `v${version} · Testing for MCP servers: an in-memory harness and matchers for your own tests, plus npx checkmcp — ${listChecks().length} spec-cited conformance checks across tools, resources and prompts in one command.`;
+  execSync(`gh api repos/gregkozakiewicz/checkmcp -X PATCH -f description=${JSON.stringify(description)}`, { stdio: 'ignore' });
+} catch {}
+
 console.log(`\n✓ v${version} pushed. The publish Action takes it from here:`);
 console.log('  https://github.com/gregkozakiewicz/checkmcp/actions');
