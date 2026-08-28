@@ -3,6 +3,9 @@ import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
 import type { JsonSchemaType } from '@modelcontextprotocol/sdk/validation/index.js';
 
+/** The spec revision this battery's checks were verified against. */
+export const SPEC_VERSION = '2025-11-25';
+
 export const CATEGORIES = ['handshake', 'schemas', 'errors', 'robustness'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
@@ -93,13 +96,14 @@ const WRONG: Record<string, unknown> = {
   object: 'not-an-object',
 };
 
-const NAME_PATTERN = /^[a-zA-Z0-9_-]{1,128}$/;
+// Letters, digits, underscore, hyphen and dot; 1-128 chars. Spec: Tool Names.
+const NAME_PATTERN = /^[a-zA-Z0-9_.-]{1,128}$/;
 
 const CHECKS: Check[] = [
   {
     id: 'handshake/server-info',
     category: 'handshake',
-    spec: 'lifecycle/initialization',
+    spec: 'basic/lifecycle#initialization',
     advisory: false,
     async run({ client }) {
       const info = client.getServerVersion();
@@ -116,7 +120,7 @@ const CHECKS: Check[] = [
   {
     id: 'handshake/tools-capability',
     category: 'handshake',
-    spec: 'lifecycle/capability-negotiation',
+    spec: 'server/tools#capabilities',
     advisory: false,
     async run({ client, tools }) {
       const declared = client.getServerCapabilities()?.tools !== undefined;
@@ -135,7 +139,7 @@ const CHECKS: Check[] = [
   {
     id: 'handshake/ping',
     category: 'handshake',
-    spec: 'utilities/ping',
+    spec: 'basic/utilities/ping',
     advisory: false,
     async run({ client }) {
       try {
@@ -152,7 +156,7 @@ const CHECKS: Check[] = [
   {
     id: 'schemas/tool-name',
     category: 'schemas',
-    spec: 'server/tools#name',
+    spec: 'server/tools#tool-names',
     advisory: false,
     async run({ tools }) {
       const failures = [];
@@ -161,7 +165,7 @@ const CHECKS: Check[] = [
         if (!NAME_PATTERN.test(tool.name)) {
           failures.push({
             subject: tool.name,
-            detail: `tool name ${JSON.stringify(tool.name)} is outside [a-zA-Z0-9_-]{1,128}`,
+            detail: `tool name ${JSON.stringify(tool.name)} is outside the allowed [a-zA-Z0-9_.-]{1,128}`,
           });
         }
         if (seen.has(tool.name)) {
@@ -175,8 +179,10 @@ const CHECKS: Check[] = [
   {
     id: 'schemas/tool-description',
     category: 'schemas',
-    spec: 'server/tools#description',
-    advisory: false,
+    spec: 'server/tools#tool',
+    // description is optional in the spec's Tool data type; flagging its
+    // absence is our judgement, so it comments without failing the run.
+    advisory: true,
     async run({ tools }) {
       const failures = tools
         .filter((tool) => !tool.description?.trim())
@@ -192,7 +198,7 @@ const CHECKS: Check[] = [
   {
     id: 'schemas/input-schema',
     category: 'schemas',
-    spec: 'server/tools#inputSchema',
+    spec: 'server/tools#tool',
     advisory: false,
     async run({ tools }) {
       const failures = [];
@@ -211,7 +217,7 @@ const CHECKS: Check[] = [
   {
     id: 'schemas/output-schema',
     category: 'schemas',
-    spec: 'server/tools#outputSchema',
+    spec: 'server/tools#output-schema',
     advisory: false,
     async run({ tools }) {
       const withSchema = tools.filter((tool) => tool.outputSchema);
@@ -231,7 +237,7 @@ const CHECKS: Check[] = [
   {
     id: 'schemas/output-schema-declared',
     category: 'schemas',
-    spec: 'server/tools#outputSchema',
+    spec: 'server/tools#output-schema',
     advisory: true,
     async run({ tools }) {
       const failures = tools
@@ -267,7 +273,7 @@ const CHECKS: Check[] = [
   {
     id: 'errors/missing-required-args',
     category: 'errors',
-    spec: 'server/tools#inputSchema',
+    spec: 'server/tools#security-considerations',
     advisory: false,
     async run({ client, tools }) {
       const eligible = tools.filter(
@@ -290,7 +296,7 @@ const CHECKS: Check[] = [
   {
     id: 'robustness/malformed-argument-types',
     category: 'robustness',
-    spec: 'server/tools#inputSchema',
+    spec: 'server/tools#security-considerations',
     advisory: false,
     async run({ client, tools }) {
       let examined = 0;
@@ -321,7 +327,7 @@ const CHECKS: Check[] = [
   {
     id: 'robustness/survives-the-battery',
     category: 'robustness',
-    spec: 'utilities/ping',
+    spec: 'basic/utilities/ping',
     advisory: false,
     async run({ client }) {
       try {

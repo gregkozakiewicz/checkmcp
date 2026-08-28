@@ -1,4 +1,4 @@
-import type { Finding, Report } from './battery.js';
+import { SPEC_VERSION, type Finding, type Report } from './battery.js';
 
 const BOLD = '\u001b[1m';
 const DIM = '\u001b[2m';
@@ -13,7 +13,7 @@ export function render(report: Report, version: string, color = process.stdout.i
   const lines: string[] = [];
 
   lines.push(
-    `checkmcp v${version} · ${report.server.name} ${report.server.version} · ${report.toolCount} tools found`,
+    `checkmcp v${version} · spec ${SPEC_VERSION} · ${report.server.name} ${report.server.version} · ${report.toolCount} tools found`,
     '',
   );
 

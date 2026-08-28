@@ -12,25 +12,29 @@ MCP servers ship fast and break silently: a tool that crashes on bad input, a sc
 npx checkmcp server.js
 ```
 
-checkmcp connects to your server, speaks the real protocol at it, and runs a battery of conformance checks against the current MCP specification:
+checkmcp connects to your server, speaks the real protocol at it, and runs a battery of conformance checks against the MCP specification (currently the 2025-11-25 revision, the one the official SDK speaks):
 
 ```text
-checkmcp v0.1.0 · spec 2026-07-28 · 21 tools found
+checkmcp v0.1.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
 
-  handshake     6/6 passed
-  schemas      11/12 passed
-  errors        5/5 passed
-  robustness    7/8 passed
+  handshake    3/3 passed
+  schemas     41/42 passed
+  errors      12/12 passed
+  robustness  17/18 passed
 
-  ✗ schemas: tool "search_orders" declares no description
-      A client model chooses tools by their descriptions. An undescribed
-      tool is invisible at best, misused at worst. Spec §5.1.
-  ✗ robustness: tool "create_invoice" crashed on malformed arguments
-      Sent {"amount": "not-a-number"}; the server threw instead of
-      returning an error result. Spec §7.3.
+  ✗ schemas: inputSchema of "search_orders" is not valid JSON Schema: unknown type "decimal"
+      schemas/input-schema · spec server/tools#tool
+  ✗ robustness: "create_invoice" accepted arguments of the wrong type ({"amount":"not-a-number"}) and returned: [...]
+      Sent deliberately mistyped values; the server should refuse before its handler runs.
+      robustness/malformed-argument-types · spec server/tools#security-considerations
+  ~ schemas: tool "search_orders" declares no description
+      A client model chooses tools by their descriptions. An undescribed tool is invisible at best, misused at worst.
+      schemas/tool-description · spec server/tools#tool
 
-  29/31 passed, 2 failed (0 advisory)
+  73/75 passed, 2 failed (1 advisory)
 ```
+
+The errors and robustness checks call your tools with deliberately broken arguments. A conformant server refuses them before its handlers run; one that does not will execute handlers on garbage. Point checkmcp at a development instance, not production.
 
 Works against a local build or a running server:
 

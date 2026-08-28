@@ -81,7 +81,13 @@ describe('battery', () => {
     expect(ids).toContain('errors/unknown-tool');        // answered a ghost
     expect(ids).toContain('errors/missing-required-args'); // trusting, called with {}
     expect(ids).toContain('robustness/malformed-argument-types');
-    expect(report.failed).toBeGreaterThanOrEqual(5);
+    expect(report.failed).toBeGreaterThanOrEqual(4);
+    // Missing description is the spec's judgement call, not its letter:
+    // it must land in the advisory count, never in failed.
+    const description = report.categories
+      .flatMap((c) => c.findings)
+      .find((f) => f.check === 'schemas/tool-description');
+    expect(description?.advisory).toBe(true);
   });
 
   test('advisory findings never move the score or the exit-relevant count', async () => {
