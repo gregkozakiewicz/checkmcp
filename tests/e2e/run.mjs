@@ -36,13 +36,21 @@ const CASES = [
   { name: 'empty', args: ['tests/fixtures/empty-server.mjs'], exit: 0 },
   { name: 'sloppy-only-schemas', args: ['tests/fixtures/sloppy-server.mjs', '--only', 'schemas'], exit: 1 },
   { name: 'list', args: ['--list'], exit: 0 },
-  { name: 'unreachable', args: ['tests/fixtures/does-not-exist.mjs'], exit: 2 },
+  {
+    name: 'unreachable',
+    args: ['tests/fixtures/does-not-exist.mjs'],
+    exit: 2,
+    // The spawned child dumps Node's module-not-found internals to stderr,
+    // and those vary by Node version. The contract is our line, not Node's.
+    keep: (line) => line.startsWith('exit ') || line === '---' || line.includes('could not connect'),
+  },
 ];
 
 let failed = 0;
-for (const { name, args, exit } of CASES) {
+for (const { name, args, exit, keep } of CASES) {
   const r = spawnSync(process.execPath, [CLI, ...args], { cwd: ROOT, encoding: 'utf8' });
-  const actual = normalize(`exit ${r.status}\n---\n${r.stdout}${r.stderr}`);
+  let actual = normalize(`exit ${r.status}\n---\n${r.stdout}${r.stderr}`);
+  if (keep) actual = actual.split('\n').filter(keep).join('\n') + '\n';
   const file = join(EXPECTED, `${name}.txt`);
 
   if (UPDATE) {
