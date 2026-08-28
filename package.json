@@ -1,0 +1,22 @@
+{
+  "name": "checkmcp",
+  "version": "0.0.1",
+  "description": "Testing toolkit for MCP servers — assertions, in-memory harness, and spec conformance checks. Placeholder release; v0.1 in development.",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "testing",
+    "test",
+    "conformance",
+    "vitest",
+    "jest"
+  ],
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ]
+}
