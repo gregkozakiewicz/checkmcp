@@ -3,6 +3,12 @@
   "version": "0.0.1",
   "description": "Testing toolkit for MCP servers — assertions, in-memory harness, and spec conformance checks. Placeholder release; v0.1 in development.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregkozakiewicz/checkmcp.git"
+  },
+  "homepage": "https://github.com/gregkozakiewicz/checkmcp#readme",
+  "bugs": "https://github.com/gregkozakiewicz/checkmcp/issues",
   "type": "module",
   "main": "index.js",
   "keywords": [
