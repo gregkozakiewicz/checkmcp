@@ -11,12 +11,15 @@ const VERSION: string = createRequire(import.meta.url)('../package.json').versio
 const USAGE = `checkmcp v${VERSION} · conformance checks for MCP servers
 
 Usage:
-  checkmcp <server.js>            spawn a server over stdio and check it
+  checkmcp <server.js> [args...]  spawn a server over stdio and check it
   checkmcp <http(s)://url>        check a running server over HTTP
   checkmcp --list                 every check, with the spec section it enforces
 
 Options:
   --only <category>               one of: ${CATEGORIES.join(', ')}
+
+checkmcp's own flags go before the server; everything after it is passed
+to the server verbatim: checkmcp --only schemas bin/server.mjs --mcp
 
 The errors and robustness categories call tools with deliberately broken
 arguments. Point checkmcp at a development instance, not production.
@@ -43,21 +46,31 @@ if (args.includes('--list')) {
   process.exit(0);
 }
 
+// Our flags come before the server; everything after it, flags included,
+// travels to the server verbatim (checkmcp bin/roast.mjs --mcp).
 let only: Category | undefined;
-const onlyAt = args.indexOf('--only');
-if (onlyAt !== -1) {
-  const value = args[onlyAt + 1];
-  if (!CATEGORIES.includes(value as Category)) {
-    fail(`--only takes one of: ${CATEGORIES.join(', ')} (got ${JSON.stringify(value ?? '')})`);
+let target: string | undefined;
+let serverArgs: string[] = [];
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--only') {
+    const value = args[++i];
+    if (!CATEGORIES.includes(value as Category)) {
+      fail(`--only takes one of: ${CATEGORIES.join(', ')} (got ${JSON.stringify(value ?? '')})`);
+    }
+    only = value as Category;
+    continue;
   }
-  only = value as Category;
-  args.splice(onlyAt, 2);
+  target = args[i];
+  serverArgs = args.slice(i + 1);
+  break;
 }
-
-// First non-flag argument is the server; the rest travel to it verbatim
-// (checkmcp node_modules/.bin/mcp-server-filesystem /some/dir).
-const [target, ...serverArgs] = args.filter((arg) => !arg.startsWith('-'));
 if (!target) fail(USAGE);
+
+if (target.endsWith('.json')) {
+  fail(
+    `${target} describes a server; it is not one. A registry manifest names the command that runs the server: use that instead, e.g.\n  checkmcp bin/server.mjs --mcp`,
+  );
+}
 
 const transport = /^https?:\/\//.test(target)
   ? new StreamableHTTPClientTransport(new URL(target))
@@ -73,7 +86,11 @@ const client = new Client({ name: 'checkmcp', version: VERSION });
 try {
   await client.connect(transport);
 } catch (error) {
-  fail(`could not connect to ${target}: ${(error as Error).message}`);
+  const reason = (error as Error).message;
+  const hint = reason.includes('ENOENT')
+    ? `\n  Not found as a command. A path in the current directory needs its prefix (./server) and must be executable; a .js/.mjs file is run with Node automatically.`
+    : '';
+  fail(`could not connect to ${target}: ${reason}${hint}`);
 }
 
 let report;

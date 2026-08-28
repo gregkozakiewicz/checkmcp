@@ -34,7 +34,7 @@ const CASES = [
   { name: 'clean', args: ['tests/fixtures/clean-server.mjs'], exit: 0 },
   { name: 'sloppy', args: ['tests/fixtures/sloppy-server.mjs'], exit: 1 },
   { name: 'empty', args: ['tests/fixtures/empty-server.mjs'], exit: 0 },
-  { name: 'sloppy-only-schemas', args: ['tests/fixtures/sloppy-server.mjs', '--only', 'schemas'], exit: 1 },
+  { name: 'sloppy-only-schemas', args: ['--only', 'schemas', 'tests/fixtures/sloppy-server.mjs'], exit: 1 },
   { name: 'list', args: ['--list'], exit: 0 },
   {
     name: 'unreachable',
