@@ -52,5 +52,6 @@
   },
   "bin": {
     "checkmcp": "dist/cli.js"
-  }
+  },
+  "author": "Greg Kozakiewicz"
 }
