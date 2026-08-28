@@ -2,6 +2,12 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.2.2] - 2026-08-28
+
+### Changed
+
+- The line on the tin: "Your server tells every AI what it can do. This makes sure it does." Opens the README and closes it before the licence; also on the site.
+
 ## [0.2.1] - 2026-08-28
 
 ### Added
