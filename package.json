@@ -1,6 +1,6 @@
 {
   "name": "checkmcp",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Testing for MCP servers: an in-memory harness and matchers for your own tests, and npx checkmcp, one command that checks any server against the spec.",
   "license": "MIT",
   "repository": {
