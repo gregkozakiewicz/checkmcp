@@ -2,6 +2,16 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.2.1] - 2026-08-28
+
+### Added
+
+- `--version` (and `-v`) prints the version.
+
+### Fixed
+
+- An unrecognised flag before the server is now an "unknown option" error instead of being spawned as if it were a server (`checkmcp --verion` no longer tries to run a program called --verion).
+
 ## [0.2.0] - 2026-08-28
 
 ### Added

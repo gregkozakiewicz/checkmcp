@@ -38,6 +38,11 @@ if (args.includes('--help') || args.length === 0) {
   process.exit(args.length === 0 ? 2 : 0);
 }
 
+if (args.includes('--version') || args.includes('-v')) {
+  console.log(VERSION);
+  process.exit(0);
+}
+
 if (args.includes('--list')) {
   for (const check of listChecks()) {
     const tag = check.advisory ? ' (advisory)' : '';
@@ -59,6 +64,10 @@ for (let i = 0; i < args.length; i++) {
     }
     only = value as Category;
     continue;
+  }
+  // A flag this far left is meant for checkmcp, and this is not one of ours.
+  if (args[i].startsWith('-')) {
+    fail(`unknown option ${args[i]} (see checkmcp --help; flags for the server go after it)`);
   }
   target = args[i];
   serverArgs = args.slice(i + 1);

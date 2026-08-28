@@ -1,0 +1,3 @@
+exit 2
+---
+unknown option --verion (see checkmcp --help; flags for the server go after it)
