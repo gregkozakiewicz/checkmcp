@@ -2,8 +2,6 @@
 
 > Testing for [Model Context Protocol](https://modelcontextprotocol.io) servers. An in-memory harness and assertions for your own tests, and one command that checks any server against the spec.
 
-**Status: v0.1 in development.** The API below is the contract being built; the current npm release (0.0.1) is a name reservation. Watch the repo for the release.
-
 MCP servers ship fast and break silently: a tool that crashes on bad input, a schema change that quietly disconnects every agent already using it. Nobody notices until an AI fails in front of a user. checkmcp is the crash-test dummy you send in first.
 
 ## The ten-second check
@@ -52,6 +50,10 @@ Every check cites the spec section it enforces. Checks that reflect judgement ra
 ## Writing your own tests
 
 The battery checks what every server must do. Your own tests check what only yours does. checkmcp runs your actual server in-memory, over the real protocol, with the network replaced by a function call: no ports, no subprocess, no model, no API keys, milliseconds per test.
+
+```bash
+npm install -D checkmcp
+```
 
 ```ts
 import { connect } from 'checkmcp';
