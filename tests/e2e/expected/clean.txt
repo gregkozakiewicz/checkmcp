@@ -1,0 +1,10 @@
+exit 0
+---
+checkmcp vX · spec 2025-11-25 · clean-fixture 1.0.0 · 1 tools found
+
+  handshake   3/3 passed
+  schemas     3/3 passed
+  errors      2/2 passed
+  robustness  2/2 passed
+
+  10/10 passed, 0 failed (0 advisory)

@@ -106,6 +106,15 @@ describe('battery', () => {
     expect(schemas.passed).toBe(schemas.examined);
   });
 
+  test('a server with no tools capability reports zero tools instead of crashing', async () => {
+    // Such a server answers tools/list with method-not-found; the battery
+    // must read that as an empty toolbox, not a broken server.
+    const { raw } = await connect(new McpServer({ name: 'bare', version: '1.0.0' }));
+    const report = await runBattery(raw);
+    expect(report.toolCount).toBe(0);
+    expect(report.failed).toBe(0);
+  });
+
   test('--only restricts to one category', async () => {
     const { raw } = await connect(clean());
     const report = await runBattery(raw, 'handshake');

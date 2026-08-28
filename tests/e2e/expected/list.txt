@@ -1,0 +1,14 @@
+exit 0
+---
+handshake/server-info                    spec basic/lifecycle#initialization
+handshake/tools-capability               spec server/tools#capabilities
+handshake/ping                           spec basic/utilities/ping
+schemas/tool-name                        spec server/tools#tool-names
+schemas/tool-description                 spec server/tools#tool (advisory)
+schemas/input-schema                     spec server/tools#tool
+schemas/output-schema                    spec server/tools#output-schema
+schemas/output-schema-declared           spec server/tools#output-schema (advisory)
+errors/unknown-tool                      spec server/tools#error-handling
+errors/missing-required-args             spec server/tools#security-considerations
+robustness/malformed-argument-types      spec server/tools#security-considerations
+robustness/survives-the-battery          spec basic/utilities/ping

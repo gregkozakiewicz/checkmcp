@@ -74,7 +74,12 @@ try {
   fail(`could not connect to ${target}: ${(error as Error).message}`);
 }
 
-const report = await runBattery(client, only);
+let report;
+try {
+  report = await runBattery(client, only);
+} catch (error) {
+  fail(`the battery failed against ${target}: ${(error as Error).message}`);
+}
 console.log(render(report, VERSION));
 await client.close();
 process.exit(report.failed > 0 ? 1 : 0);

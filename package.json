@@ -45,7 +45,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "vitest run"
+    "test": "vitest run && npm run build && node tests/e2e/run.mjs"
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0"

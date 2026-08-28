@@ -1,0 +1,10 @@
+exit 0
+---
+checkmcp vX · spec 2025-11-25 · empty 1.0.0 · 0 tools found
+
+  handshake   3/3 passed
+  schemas     0/0 passed
+  errors      1/1 passed
+  robustness  1/1 passed
+
+  5/5 passed, 0 failed (0 advisory)

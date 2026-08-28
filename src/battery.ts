@@ -357,7 +357,15 @@ const CHECKS: Check[] = [
  * garbage. Point the battery at a development instance, not production.
  */
 export async function runBattery(client: Client, only?: Category): Promise<Report> {
-  const tools = (await client.listTools()).tools;
+  // A server that offers no tools may not implement tools/list at all;
+  // method-not-found means zero tools, not a broken server.
+  const tools = await client.listTools().then(
+    (r) => r.tools,
+    (error) => {
+      if ((error as { code?: number }).code === -32601) return [];
+      throw error;
+    },
+  );
   const ctx: Context = { client, tools };
   const info = client.getServerVersion();
 
