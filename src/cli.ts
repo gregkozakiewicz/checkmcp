@@ -54,7 +54,9 @@ if (onlyAt !== -1) {
   args.splice(onlyAt, 2);
 }
 
-const target = args.find((arg) => !arg.startsWith('-'));
+// First non-flag argument is the server; the rest travel to it verbatim
+// (checkmcp node_modules/.bin/mcp-server-filesystem /some/dir).
+const [target, ...serverArgs] = args.filter((arg) => !arg.startsWith('-'));
 if (!target) fail(USAGE);
 
 const transport = /^https?:\/\//.test(target)
@@ -63,8 +65,8 @@ const transport = /^https?:\/\//.test(target)
       // A .js/.mjs/.cjs file runs under this same Node; anything else is
       // treated as an executable and spawned as-is.
       /\.(mjs|cjs|js)$/.test(target)
-        ? { command: process.execPath, args: [target] }
-        : { command: target, args: [] },
+        ? { command: process.execPath, args: [target, ...serverArgs] }
+        : { command: target, args: serverArgs },
     );
 
 const client = new Client({ name: 'checkmcp', version: VERSION });

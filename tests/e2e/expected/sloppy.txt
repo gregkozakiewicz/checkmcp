@@ -21,10 +21,7 @@ checkmcp vX · spec 2025-11-25 · sloppy 0.0.1 · 2 tools found
   ~ schemas: tool "mystery" declares no description
       A client model chooses tools by their descriptions. An undescribed tool is invisible at best, misused at worst.
       schemas/tool-description · spec server/tools#tool
-  ~ schemas: tool "mystery" declares no output schema
-      With outputSchema declared, clients can validate results and type integrations.
-      schemas/output-schema-declared · spec server/tools#output-schema
-  ~ schemas: tool "trusting" declares no output schema
+  ~ schemas: 2 tools declare no output schema ("mystery", "trusting")
       With outputSchema declared, clients can validate results and type integrations.
       schemas/output-schema-declared · spec server/tools#output-schema
 
