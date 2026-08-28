@@ -1,0 +1,7 @@
+# Internal docs: roadmap, strategy, handover, working rules. Never pushed to the public repo.
+internal/
+CLAUDE.md
+
+node_modules/
+*.tgz
+.DS_Store
