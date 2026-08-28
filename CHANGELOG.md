@@ -2,6 +2,14 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.1.1] - 2026-08-28
+
+### Fixed
+
+- Flags after the server now travel to it verbatim (`checkmcp bin/server.mjs --mcp`); previously the CLI swallowed them. checkmcp's own flags go before the server.
+- Pointing checkmcp at a `.json` registry manifest now explains that a manifest describes a server rather than being one, instead of a raw spawn error.
+- A target that cannot be spawned gets a hint about `./` prefixes and executability instead of a bare ENOENT.
+
 ## [0.1.0] - 2026-08-28
 
 ### Added
