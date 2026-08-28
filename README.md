@@ -45,7 +45,15 @@ npx checkmcp server.js --only schemas        # one category
 npx checkmcp --list                          # every check, with its spec section
 ```
 
-Exit code 0 when everything passes, 1 on failures, 2 when it cannot connect. Wire it into CI as-is.
+| | |
+|---|---|
+| `checkmcp <server.js> [args...]` | spawn the server over stdio; everything after the file goes to it verbatim |
+| `checkmcp <http(s)://url>` | check a running server over HTTP |
+| `--only <category>` | one of `handshake`, `schemas`, `errors`, `robustness` (before the server) |
+| `--list` | every check, with the spec section it enforces |
+| exit codes | `0` all passed · `1` failures · `2` could not connect |
+
+Wire it into CI as-is.
 
 Every check cites the spec section it enforces. Checks that reflect judgement rather than the letter of the spec are marked advisory and never fail the run.
 

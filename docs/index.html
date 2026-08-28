@@ -44,6 +44,7 @@
   .term pre { padding:18px 20px 20px; font:13px/1.75 var(--mono); color:#cbd5e1; overflow-x:auto; }
   .term .g { color:#34d399; } .term .r { color:#f87171; } .term .y { color:#fbbf24; } .term .d { color:#64748b; } .term .w { color:#f1f5f9; font-weight:700; }
   .fine { font-size:12.5px; color:var(--dim2); margin-bottom:34px; }
+  .facts { font:600 12.5px/1.6 var(--mono); color:var(--dim); margin:2px 0 0; }
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:12px 0 34px; }
   .cardx { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; }
   .cardx h3 { font:600 15px/1.3 'Sora',sans-serif; margin-bottom:6px; }
@@ -71,6 +72,7 @@
   <button class="cmd" onclick="navigator.clipboard&&navigator.clipboard.writeText('npx checkmcp server.js');this.querySelector('.p').textContent='copied ';setTimeout(()=>{this.querySelector('.p').textContent='$ '},1200)"><span class="p">$ </span>npx checkmcp server.js</button>
   <span class="links"><a href="https://github.com/gregkozakiewicz/checkmcp">GitHub</a> · <a href="https://www.npmjs.com/package/checkmcp">npm</a> · MIT · zero dependencies · no telemetry</span>
 </div>
+<p class="facts">23 checks · tools, resources and prompts · every check cites the spec (2025-11-25) · the official reference servers pass with 0 failures</p>
 
 <div class="term"><div class="term-bar"><i></i><i></i><i></i></div>
 <pre>checkmcp v0.1.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
@@ -92,7 +94,7 @@
 <p class="fine">Every check cites the spec section it enforces. The official reference servers pass with zero failures; does yours?</p>
 
 <div class="grid">
-  <div class="cardx"><h3>The ten-second inspection</h3><p>A battery of conformance checks against the MCP specification: handshake, schemas, errors, robustness. No test files, no API keys, no model. Exit codes made for CI.</p></div>
+  <div class="cardx"><h3>The ten-second inspection</h3><p>A battery of conformance checks over the whole surface: tools, resources and prompts, in four categories. No test files, no API keys, no model. Exit codes made for CI.</p></div>
   <div class="cardx"><h3>Tests only you can write</h3><p>An in-memory harness and five matchers for vitest and jest. Your real server, the real protocol, the network replaced by a function call: milliseconds per test.<br><code>expect(result).toBeToolSuccess()</code></p></div>
   <div class="cardx"><h3>Contracts that cannot drift</h3><p>Tool schemas snapshotted to committed files. A careless change fails CI with a sentence a human can judge: <i>"was optional, now required. This breaks every caller that omits it."</i></p></div>
 </div>
