@@ -27,6 +27,7 @@
   ],
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
+    "@types/node": "^26.4.0",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11",
     "zod": "^4.4.3"
@@ -48,5 +49,8 @@
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0"
+  },
+  "bin": {
+    "checkmcp": "dist/cli.js"
   }
 }
