@@ -1,7 +1,7 @@
 {
   "name": "checkmcp",
   "version": "0.1.2",
-  "description": "Testing toolkit for MCP servers — assertions, in-memory harness, and spec conformance checks. Placeholder release; v0.1 in development.",
+  "description": "Testing for MCP servers: an in-memory harness and matchers for your own tests, and npx checkmcp, one command that checks any server against the spec.",
   "license": "MIT",
   "repository": {
     "type": "git",
