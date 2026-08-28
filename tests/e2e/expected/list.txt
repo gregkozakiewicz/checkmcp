@@ -2,6 +2,7 @@ exit 0
 ---
 handshake/server-info                    spec basic/lifecycle#initialization
 handshake/tools-capability               spec server/tools#capabilities
+handshake/declared-lists-answer          spec basic/lifecycle#capability-negotiation
 handshake/ping                           spec basic/utilities/ping
 schemas/tool-name                        spec server/tools#tool-names
 schemas/tool-description                 spec server/tools#tool (advisory)
@@ -11,4 +12,14 @@ schemas/output-schema-declared           spec server/tools#output-schema (adviso
 errors/unknown-tool                      spec server/tools#error-handling
 errors/missing-required-args             spec server/tools#security-considerations
 robustness/malformed-argument-types      spec server/tools#security-considerations
+schemas/resource-fields                  spec server/resources#resource
+schemas/resource-template-uris           spec server/resources#resource-templates
+schemas/prompt-arguments                 spec server/prompts#prompt
+errors/unknown-resource                  spec server/resources#error-handling
+errors/resource-not-found-code           spec server/resources#error-handling (advisory)
+errors/unknown-prompt                    spec server/prompts#error-handling
+errors/prompt-missing-required-args      spec server/prompts#error-handling
+robustness/resources-readable            spec server/resources#resource-contents
+robustness/prompts-render                spec server/prompts#promptmessage
+robustness/bogus-cursor                  spec server/utilities/pagination
 robustness/survives-the-battery          spec basic/utilities/ping

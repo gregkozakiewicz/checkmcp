@@ -6,10 +6,34 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
   ListToolsRequestSchema,
+  ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 
-const server = new Server({ name: 'sloppy', version: '0.0.1' }, { capabilities: { tools: {} } });
+const server = new Server(
+  { name: 'sloppy', version: '0.0.1' },
+  { capabilities: { tools: {}, resources: {}, prompts: {} } },
+);
+// A URI no parser accepts; reads invent contents for any URI, including ghosts.
+server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+  resources: [
+    { uri: 'nonsense uri with spaces', name: 'shaky' },
+    { uri: 'file:///real.txt', name: 'real' },
+  ],
+}));
+server.setRequestHandler(ReadResourceRequestSchema, async (r) => ({
+  contents: [{ uri: r.params.uri, text: 'made it up' }],
+}));
+// A required argument nobody checks; renders whatever it is sent.
+server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+  prompts: [{ name: 'gullible', arguments: [{ name: 'topic', required: true }] }],
+}));
+server.setRequestHandler(GetPromptRequestSchema, async () => ({
+  messages: [{ role: 'user', content: { type: 'text', text: 'ok' } }],
+}));
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     { name: 'mystery', inputSchema: { type: 'object', properties: { id: { type: 'flavour' } } } },

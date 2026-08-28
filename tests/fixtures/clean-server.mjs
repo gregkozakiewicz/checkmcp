@@ -16,4 +16,15 @@ server.registerTool(
     structuredContent: { sum: a + b },
   }),
 );
+server.registerResource(
+  'greeting',
+  'greeting://hello',
+  { description: 'A fixed greeting' },
+  async (uri) => ({ contents: [{ uri: uri.href, text: 'hello' }] }),
+);
+server.registerPrompt(
+  'review',
+  { description: 'Ask for a review', argsSchema: { topic: z.string() } },
+  ({ topic }) => ({ messages: [{ role: 'user', content: { type: 'text', text: `Review ${topic}` } }] }),
+);
 await server.connect(new StdioServerTransport());

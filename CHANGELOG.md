@@ -2,6 +2,18 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.2.0] - 2026-08-28
+
+### Added
+
+- Full protocol surface: the battery now checks resources and prompts alongside tools, 23 checks in the same four categories. Resource fields and URIs (RFC 3986), URI templates, prompt argument declarations, unknown-resource and unknown-prompt refusals, required prompt arguments, every listed resource readable, prompts render well-formed messages, bogus pagination cursors survived, and declared capabilities that actually answer.
+- Advisory check for the resource-not-found error code: the spec reserves -32002, and (interestingly) the official SDK's default answers -32602. Advisory, so it never fails a run.
+- Resource and prompt checks run only when the server declares the capability; a tools-only server is examined exactly as before.
+
+### Fixed
+
+- The npm package description no longer calls the package a placeholder.
+
 ## [0.1.2] - 2026-08-28
 
 ### Added

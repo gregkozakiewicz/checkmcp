@@ -3,14 +3,18 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import {
   CallToolRequestSchema,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
   ListToolsRequestSchema,
+  ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import { connect } from '../src/index.js';
 import { runBattery, listChecks } from '../src/battery.js';
 import { render } from '../src/report.js';
 
-/** A server with nothing to hide. */
+/** A server with nothing to hide, on every surface. */
 function clean() {
   const server = new McpServer({ name: 'clean', version: '1.0.0' });
   server.registerTool(
@@ -25,6 +29,17 @@ function clean() {
       structuredContent: { sum: a + b },
     }),
   );
+  server.registerResource(
+    'greeting',
+    'greeting://hello',
+    { description: 'A fixed greeting' },
+    async (uri) => ({ contents: [{ uri: uri.href, text: 'hello' }] }),
+  );
+  server.registerPrompt(
+    'review',
+    { description: 'Ask for a review', argsSchema: { topic: z.string() } },
+    ({ topic }) => ({ messages: [{ role: 'user', content: { type: 'text', text: `Review ${topic}` } }] }),
+  );
   return server;
 }
 
@@ -36,8 +51,27 @@ function clean() {
 function sloppy() {
   const server = new Server(
     { name: 'sloppy', version: '0.0.1' },
-    { capabilities: { tools: {} } },
+    { capabilities: { tools: {}, resources: {}, prompts: {} } },
   );
+  // A URI no parser accepts (the SDK client rejects a missing name outright,
+  // so that sin cannot even be listed); reads never fail, whatever the URI,
+  // and return contents with no payload.
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: [
+      { uri: 'nonsense uri with spaces', name: 'shaky' },
+      { uri: 'file:///real.txt', name: 'real' },
+    ],
+  }));
+  server.setRequestHandler(ReadResourceRequestSchema, async (r) => ({
+    contents: [{ uri: r.params.uri, text: 'made it up' }],
+  }));
+  // Prompts: a required argument nobody checks; renders whatever it is sent.
+  server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+    prompts: [{ name: 'gullible', arguments: [{ name: 'topic', required: true }] }],
+  }));
+  server.setRequestHandler(GetPromptRequestSchema, async () => ({
+    messages: [{ role: 'user', content: { type: 'text', text: 'ok' } }],
+  }));
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
       // No description; inputSchema declares a nonsense type.
@@ -119,6 +153,29 @@ describe('battery', () => {
     const { raw } = await connect(clean());
     const report = await runBattery(raw, 'handshake');
     expect(report.categories.map((c) => c.category)).toEqual(['handshake']);
+  });
+
+  test('the sloppy resource and prompt surface is caught too', async () => {
+    const { raw } = await connect(sloppy());
+    const report = await runBattery(raw);
+    const ids = report.categories.flatMap((c) => c.findings).map((f) => f.check);
+    expect(ids).toContain('schemas/resource-fields');           // no name, unparseable URI
+    expect(ids).toContain('errors/unknown-resource');           // read a ghost, got contents
+    expect(ids).toContain('errors/unknown-prompt');             // rendered a ghost
+    expect(ids).toContain('errors/prompt-missing-required-args'); // gullible, called bare
+  });
+
+  test('a tools-only server examines nothing on the surfaces it does not declare', async () => {
+    const server = new McpServer({ name: 'plain', version: '1.0.0' });
+    server.registerTool(
+      'echo',
+      { description: 'Echo', inputSchema: { text: z.string() } },
+      async ({ text }) => ({ content: [{ type: 'text', text }] }),
+    );
+    const { raw } = await connect(server);
+    const report = await runBattery(raw);
+    const ids = report.categories.flatMap((c) => c.findings).map((f) => f.check);
+    expect(ids.filter((id) => id.includes('resource') || id.includes('prompt'))).toEqual([]);
   });
 
   test('every check carries a spec citation', () => {

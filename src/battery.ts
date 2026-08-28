@@ -1,6 +1,6 @@
 import { AjvJsonSchemaValidator } from '@modelcontextprotocol/sdk/validation/ajv';
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { CallToolResult, Prompt, Resource, ResourceTemplate, Tool } from '@modelcontextprotocol/sdk/types.js';
 import type { JsonSchemaType } from '@modelcontextprotocol/sdk/validation/index.js';
 
 /** The spec revision this battery's checks were verified against. */
@@ -52,6 +52,10 @@ interface Check {
 interface Context {
   client: Client;
   tools: Tool[];
+  /** undefined when the capability is not declared: those checks then examine nothing. */
+  resources: Resource[] | undefined;
+  templates: ResourceTemplate[] | undefined;
+  prompts: Prompt[] | undefined;
 }
 
 const ajv = new AjvJsonSchemaValidator();
@@ -134,6 +138,32 @@ const CHECKS: Check[] = [
             ]
           : [];
       return { examined: 1, failures };
+    },
+  },
+  {
+    id: 'handshake/declared-lists-answer',
+    category: 'handshake',
+    spec: 'basic/lifecycle#capability-negotiation',
+    advisory: false,
+    async run({ client }) {
+      const caps = client.getServerCapabilities();
+      const declared: [string, () => Promise<unknown>][] = [];
+      if (caps?.tools) declared.push(['tools/list', () => client.listTools()]);
+      if (caps?.resources) declared.push(['resources/list', () => client.listResources()]);
+      if (caps?.prompts) declared.push(['prompts/list', () => client.listPrompts()]);
+      const failures = [];
+      for (const [method, call] of declared) {
+        try {
+          await call();
+        } catch (error) {
+          failures.push({
+            subject: method,
+            detail: `the server declares the capability but ${method} fails: ${(error as Error).message}`,
+            advice: 'Only declare capabilities the server actually answers for.',
+          });
+        }
+      }
+      return { examined: declared.length, failures };
     },
   },
   {
@@ -325,6 +355,258 @@ const CHECKS: Check[] = [
     },
   },
   {
+    id: 'schemas/resource-fields',
+    category: 'schemas',
+    spec: 'server/resources#resource',
+    advisory: false,
+    async run({ resources }) {
+      const failures = [];
+      for (const resource of resources ?? []) {
+        if (!resource.name) {
+          failures.push({ subject: resource.uri, detail: `resource ${resource.uri} declares no name` });
+        }
+        try {
+          new URL(resource.uri);
+        } catch {
+          failures.push({
+            subject: resource.uri,
+            detail: `resource URI ${JSON.stringify(resource.uri)} is not a valid URI (RFC 3986)`,
+          });
+        }
+      }
+      return { examined: resources?.length ?? 0, failures };
+    },
+  },
+  {
+    id: 'schemas/resource-template-uris',
+    category: 'schemas',
+    spec: 'server/resources#resource-templates',
+    advisory: false,
+    async run({ templates }) {
+      const failures = [];
+      for (const template of templates ?? []) {
+        const t = template.uriTemplate;
+        const balanced = (t.match(/\{/g) ?? []).length === (t.match(/\}/g) ?? []).length;
+        if (!t || !balanced) {
+          failures.push({
+            subject: template.name,
+            detail: `uriTemplate ${JSON.stringify(t)} of "${template.name}" is not a usable URI template (RFC 6570)`,
+          });
+        }
+      }
+      return { examined: templates?.length ?? 0, failures };
+    },
+  },
+  {
+    id: 'schemas/prompt-arguments',
+    category: 'schemas',
+    spec: 'server/prompts#prompt',
+    advisory: false,
+    async run({ prompts }) {
+      const failures = [];
+      for (const prompt of prompts ?? []) {
+        for (const arg of prompt.arguments ?? []) {
+          if (!arg.name) {
+            failures.push({
+              subject: prompt.name,
+              detail: `prompt "${prompt.name}" declares an argument with no name`,
+            });
+          }
+        }
+      }
+      return { examined: prompts?.length ?? 0, failures };
+    },
+  },
+  {
+    id: 'errors/unknown-resource',
+    category: 'errors',
+    spec: 'server/resources#error-handling',
+    advisory: false,
+    async run({ client, resources }) {
+      if (resources === undefined) return { examined: 0, failures: [] };
+      try {
+        const result = await client.readResource({ uri: 'checkmcp://no-such-resource' });
+        return {
+          examined: 1,
+          failures: [
+            {
+              detail: `reading a resource that does not exist returned contents: ${JSON.stringify(result.contents).slice(0, 120)}`,
+              advice: 'Unknown URIs must produce an error (-32002 Resource not found).',
+            },
+          ],
+        };
+      } catch {
+        return { examined: 1, failures: [] };
+      }
+    },
+  },
+  {
+    id: 'errors/resource-not-found-code',
+    category: 'errors',
+    spec: 'server/resources#error-handling',
+    advisory: true,
+    async run({ client, resources }) {
+      if (resources === undefined) return { examined: 0, failures: [] };
+      try {
+        await client.readResource({ uri: 'checkmcp://no-such-resource' });
+        return { examined: 0, failures: [] }; // the non-advisory check reports this
+      } catch (error) {
+        const code = (error as { code?: number }).code;
+        return {
+          examined: 1,
+          failures:
+            code === -32002
+              ? []
+              : [
+                  {
+                    detail: `an unknown resource was refused with code ${code}; the spec reserves -32002 for resource-not-found`,
+                    advice: 'Clients branch on the code; -32002 tells them the URI, not the server, is at fault.',
+                  },
+                ],
+        };
+      }
+    },
+  },
+  {
+    id: 'errors/unknown-prompt',
+    category: 'errors',
+    spec: 'server/prompts#error-handling',
+    advisory: false,
+    async run({ client, prompts }) {
+      if (prompts === undefined) return { examined: 0, failures: [] };
+      try {
+        await client.getPrompt({ name: 'checkmcp_no_such_prompt' });
+        return {
+          examined: 1,
+          failures: [
+            {
+              detail: 'getting a prompt that does not exist succeeded',
+              advice: 'An invalid prompt name must produce -32602 (Invalid params).',
+            },
+          ],
+        };
+      } catch {
+        return { examined: 1, failures: [] };
+      }
+    },
+  },
+  {
+    id: 'errors/prompt-missing-required-args',
+    category: 'errors',
+    spec: 'server/prompts#error-handling',
+    advisory: false,
+    async run({ client, prompts }) {
+      const eligible = (prompts ?? []).filter((p) => p.arguments?.some((a) => a.required));
+      const failures = [];
+      for (const prompt of eligible) {
+        try {
+          await client.getPrompt({ name: prompt.name });
+          failures.push({
+            subject: prompt.name,
+            detail: `prompt "${prompt.name}" rendered without its required arguments`,
+            advice: 'Missing required arguments must produce -32602 (Invalid params).',
+          });
+        } catch {
+          // refused, as it should be
+        }
+      }
+      return { examined: eligible.length, failures };
+    },
+  },
+  {
+    id: 'robustness/resources-readable',
+    category: 'robustness',
+    spec: 'server/resources#resource-contents',
+    advisory: false,
+    async run({ client, resources }) {
+      // Reading is the point of listing; a listed resource that cannot be
+      // read is a broken promise. Capped so a huge server stays checkable.
+      const sample = (resources ?? []).slice(0, 20);
+      const failures = [];
+      for (const resource of sample) {
+        try {
+          // Malformed contents never arrive: the SDK client rejects them in
+          // transit, which surfaces here as a read failure.
+          await client.readResource({ uri: resource.uri });
+        } catch (error) {
+          failures.push({
+            subject: resource.uri,
+            detail: `listed resource ${resource.uri} cannot be read: ${(error as Error).message}`,
+          });
+        }
+      }
+      if ((resources?.length ?? 0) > sample.length) {
+        failures.push({
+          detail: `only the first ${sample.length} of ${resources!.length} resources were read; the rest were not checked`,
+          advice: 'A cap, not a verdict: rerun against a smaller instance for full coverage.',
+        });
+      }
+      return { examined: sample.length, failures };
+    },
+  },
+  {
+    id: 'robustness/prompts-render',
+    category: 'robustness',
+    spec: 'server/prompts#promptmessage',
+    advisory: false,
+    async run({ client, prompts }) {
+      // Filled with placeholder text; a server may legitimately refuse the
+      // values, so only a malformed SUCCESS is a failure.
+      const sample = (prompts ?? []).slice(0, 10);
+      const failures = [];
+      for (const prompt of sample) {
+        const args = Object.fromEntries(
+          (prompt.arguments ?? []).filter((a) => a.required).map((a) => [a.name, 'checkmcp']),
+        );
+        let messages;
+        try {
+          messages = (await client.getPrompt({ name: prompt.name, arguments: args })).messages;
+        } catch {
+          continue;
+        }
+        const bad = messages.find(
+          (m) => (m.role !== 'user' && m.role !== 'assistant') || !m.content?.type,
+        );
+        if (messages.length === 0 || bad) {
+          failures.push({
+            subject: prompt.name,
+            detail: `prompt "${prompt.name}" rendered malformed messages: ${JSON.stringify(messages).slice(0, 120)}`,
+          });
+        }
+      }
+      return { examined: sample.length, failures };
+    },
+  },
+  {
+    id: 'robustness/bogus-cursor',
+    category: 'robustness',
+    spec: 'server/utilities/pagination',
+    advisory: false,
+    async run({ client, resources, prompts }) {
+      // A garbage cursor may be answered or refused; it must not kill the
+      // server. The follow-up ping is the actual verdict.
+      const surfaces: [string, () => Promise<unknown>][] = [
+        ['tools/list', () => client.listTools({ cursor: 'checkmcp-bogus-cursor' })],
+      ];
+      if (resources) surfaces.push(['resources/list', () => client.listResources({ cursor: 'checkmcp-bogus-cursor' })]);
+      if (prompts) surfaces.push(['prompts/list', () => client.listPrompts({ cursor: 'checkmcp-bogus-cursor' })]);
+      const failures = [];
+      for (const [method, call] of surfaces) {
+        await call().catch(() => undefined);
+        try {
+          await client.ping();
+        } catch (error) {
+          failures.push({
+            subject: method,
+            detail: `a bogus pagination cursor on ${method} took the server down: ${(error as Error).message}`,
+          });
+          break;
+        }
+      }
+      return { examined: surfaces.length, failures };
+    },
+  },
+  {
     id: 'robustness/survives-the-battery',
     category: 'robustness',
     spec: 'basic/utilities/ping',
@@ -366,7 +648,18 @@ export async function runBattery(client: Client, only?: Category): Promise<Repor
       throw error;
     },
   );
-  const ctx: Context = { client, tools };
+
+  // Resources and prompts are checked only when their capability is declared.
+  // A declared capability whose list call fails yields an empty list here;
+  // handshake/declared-lists-answer reports the breakage itself.
+  const caps = client.getServerCapabilities();
+  const listed = async <T>(declared: unknown, list: () => Promise<T[]>): Promise<T[] | undefined> =>
+    declared === undefined ? undefined : list().catch(() => []);
+  const resources = await listed(caps?.resources, async () => (await client.listResources()).resources);
+  const templates = await listed(caps?.resources, async () => (await client.listResourceTemplates()).resourceTemplates);
+  const prompts = await listed(caps?.prompts, async () => (await client.listPrompts()).prompts);
+
+  const ctx: Context = { client, tools, resources, templates, prompts };
   const info = client.getServerVersion();
 
   const categories: CategoryScore[] = [];
