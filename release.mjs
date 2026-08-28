@@ -57,8 +57,10 @@ if (typed.trim() !== version) die('confirmation did not match; nothing released'
 pkg.version = version;
 writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
 run(`git commit -am "Release v${version}"`);
-run(`git tag v${version}`);
-run('git push --follow-tags');
+// Annotated, and pushed by name: --follow-tags ignores lightweight tags,
+// which once left a release tagged locally with no publish run (v0.1.0).
+run(`git tag -a v${version} -m "v${version}"`);
+run(`git push origin main v${version}`);
 
 console.log(`\n✓ v${version} pushed. The publish Action takes it from here:`);
 console.log('  https://github.com/gregkozakiewicz/checkmcp/actions');
