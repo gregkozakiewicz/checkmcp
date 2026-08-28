@@ -1,5 +1,7 @@
 # checkmcp
 
+[![npm](https://img.shields.io/npm/v/checkmcp?color=2dd4bf&label=npm)](https://www.npmjs.com/package/checkmcp) [![downloads](https://img.shields.io/npm/dm/checkmcp?color=2dd4bf&label=downloads)](https://www.npmjs.com/package/checkmcp) [![Socket](https://badge.socket.dev/npm/package/checkmcp)](https://socket.dev/npm/package/checkmcp) [![license](https://img.shields.io/badge/licence-MIT-blue)](LICENSE) [![zero dependencies](https://img.shields.io/badge/dependencies-0-2dd4bf)](https://www.npmjs.com/package/checkmcp?activeTab=dependencies) [![no telemetry](https://img.shields.io/badge/no-telemetry-2dd4bf)](https://gregkozakiewicz.github.io/checkmcp/)
+
 > Testing for [Model Context Protocol](https://modelcontextprotocol.io) servers. An in-memory harness and assertions for your own tests, and one command that checks any server against the spec.
 
 MCP servers ship fast and break silently: a tool that crashes on bad input, a schema change that quietly disconnects every agent already using it. Nobody notices until an AI fails in front of a user. checkmcp is the crash-test dummy you send in first.

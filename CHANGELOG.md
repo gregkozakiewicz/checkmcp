@@ -2,6 +2,12 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.1.2] - 2026-08-28
+
+### Added
+
+- Badge row in the README: npm version, downloads, Socket security score, licence, zero dependencies, no telemetry.
+
 ## [0.1.1] - 2026-08-28
 
 ### Fixed
