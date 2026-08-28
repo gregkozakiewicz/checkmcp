@@ -66,7 +66,7 @@ run(`git push origin main v${version}`);
 // a missing gh must never fail a release.
 try {
   const { listChecks } = await import('./dist/battery.js');
-  const description = `v${version} · Testing for MCP servers: an in-memory harness and matchers for your own tests, plus npx checkmcp — ${listChecks().length} spec-cited conformance checks across tools, resources and prompts in one command.`;
+  const description = `v${version} · Testing for MCP servers: an in-memory harness and matchers for your own tests, plus npx checkmcp, ${listChecks().length} spec-cited conformance checks in one command across tools, resources and prompts.`;
   execSync(`gh api repos/gregkozakiewicz/checkmcp -X PATCH -f description=${JSON.stringify(description)}`, { stdio: 'ignore' });
 } catch {}
 
