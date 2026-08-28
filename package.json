@@ -36,6 +36,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./matchers": {
+      "types": "./dist/matchers.d.ts",
+      "default": "./dist/matchers.js"
     }
   },
   "scripts": {

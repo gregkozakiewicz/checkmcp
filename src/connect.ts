@@ -8,6 +8,8 @@ import type {
   ReadResourceResult,
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
+import type { JsonSchemaType } from '@modelcontextprotocol/sdk/validation/index.js';
+import { tagResult } from './meta.js';
 
 /** A connected test client. Every call travels the real protocol; only the wire is fake. */
 export interface TestClient {
@@ -39,10 +41,23 @@ export async function connect(server: McpServer | Server): Promise<TestClient> {
   await server.connect(serverEnd);
   await raw.connect(clientEnd);
 
+  // Tool list cache, for tagging results with their tool's declared output
+  // schema. Refreshed once on a miss, so a tool registered after connect()
+  // is still found.
+  let known: Map<string, Tool> | undefined;
+  const lookup = async (name: string): Promise<Tool | undefined> => {
+    if (!known?.has(name)) {
+      known = new Map((await raw.listTools()).tools.map((t) => [t.name, t]));
+    }
+    return known.get(name);
+  };
+
   return {
     async tool(name, args) {
       // The full result schema keeps structuredContent; the compatibility one drops it.
-      return (await raw.callTool({ name, arguments: args })) as CallToolResult;
+      const result = (await raw.callTool({ name, arguments: args })) as CallToolResult;
+      const outputSchema = (await lookup(name))?.outputSchema as JsonSchemaType | undefined;
+      return tagResult(result, { tool: name, args, outputSchema });
     },
     async tools() {
       return (await raw.listTools()).tools;
