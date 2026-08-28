@@ -1,7 +1,7 @@
 {
   "name": "checkmcp",
   "version": "0.0.1",
-  "description": "Testing toolkit for MCP servers — assertions, in-memory harness, and spec conformance checks. Placeholder release; v0.1 in development.",
+  "description": "Testing toolkit for MCP servers \u2014 assertions, in-memory harness, and spec conformance checks. Placeholder release; v0.1 in development.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
   "homepage": "https://github.com/gregkozakiewicz/checkmcp#readme",
   "bugs": "https://github.com/gregkozakiewicz/checkmcp/issues",
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -21,8 +21,28 @@
     "jest"
   ],
   "files": [
-    "index.js",
+    "dist",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11",
+    "zod": "^4.4.3"
+  },
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  }
 }
