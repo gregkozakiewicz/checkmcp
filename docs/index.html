@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>checkmcp · the crash-test dummy for MCP servers</title>
+<meta name="description" content="One command that checks any MCP server against the spec, and an in-memory harness for writing your own tests. Free, MIT, no telemetry.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Sora:wght@600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#020617; --card:rgba(15,23,42,.6); --line:rgba(51,65,85,.7); --text:#f1f5f9; --dim:#94a3b8; --dim2:#64748b; --mint:#2dd4bf;
+    --red:#f87171; --yellow:#fbbf24; --glow1:rgba(45,212,191,.08); --glow2:rgba(56,189,248,.06);
+    --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace; }
+  html[data-theme="light"] { --bg:#eeecfb; --card:rgba(255,255,255,.6); --line:rgba(15,15,26,.1); --text:#0f0f1a; --dim:#6b6b85; --dim2:#9494ad;
+    --mint:#0d9463; --red:#d43c3c; --yellow:#a96b00; --glow1:#d8d1f7; --glow2:#e8e3fb; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { color:var(--text); font:16px/1.6 'Manrope',ui-sans-serif,system-ui,sans-serif; background:var(--bg); }
+  body::before { content:''; position:fixed; inset:0; z-index:-1; background:
+    radial-gradient(1200px 600px at 10% -10%, var(--glow1) 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 10%, var(--glow2) 0%, transparent 55%), var(--bg); }
+  .theme-toggle { position:fixed; top:18px; right:18px; width:40px; height:40px; border-radius:99px; border:1px solid var(--line);
+    background:var(--card); display:grid; place-items:center; cursor:pointer; color:var(--dim); z-index:2; }
+  .theme-toggle:hover { color:var(--text); }
+  .theme-toggle svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .theme-toggle .moon { display:none; }
+  html[data-theme="light"] .theme-toggle .moon { display:block; }
+  html[data-theme="light"] .theme-toggle .sun { display:none; }
+  main { max-width:760px; margin:0 auto; padding:64px 24px 64px; }
+  .kicker { font:700 10.5px/1 sans-serif; letter-spacing:.16em; text-transform:uppercase; color:var(--mint); }
+  h1 { font:700 clamp(30px,5.5vw,42px)/1.15 'Sora','Manrope',sans-serif; letter-spacing:-.02em; margin:12px 0 14px; }
+  .sub { color:var(--dim); font-size:17px; max-width:560px; }
+  .sub b { color:var(--text); }
+  a { color:var(--mint); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .install { display:flex; align-items:center; gap:12px; margin:26px 0 8px; flex-wrap:wrap; }
+  .cmd { font:700 15px/1 var(--mono); color:var(--mint); background:var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:13px 16px; cursor:pointer; }
+  .cmd:hover { border-color:var(--mint); }
+  .cmd .p { color:var(--dim2); user-select:none; }
+  .links { font-size:14px; color:var(--dim); }
+  .links a { font-weight:600; }
+  .term { margin:30px 0 6px; background:#0b1120; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    box-shadow:0 24px 60px rgba(2,6,23,.45); }
+  html[data-theme="light"] .term { background:#101425; }
+  .term-bar { display:flex; gap:6px; padding:11px 14px; border-bottom:1px solid rgba(51,65,85,.5); }
+  .term-bar i { width:10px; height:10px; border-radius:99px; background:#334155; }
+  .term pre { padding:18px 20px 20px; font:13px/1.75 var(--mono); color:#cbd5e1; overflow-x:auto; }
+  .term .g { color:#34d399; } .term .r { color:#f87171; } .term .y { color:#fbbf24; } .term .d { color:#64748b; } .term .w { color:#f1f5f9; font-weight:700; }
+  .fine { font-size:12.5px; color:var(--dim2); margin-bottom:34px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:12px 0 34px; }
+  .cardx { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; }
+  .cardx h3 { font:600 15px/1.3 'Sora',sans-serif; margin-bottom:6px; }
+  .cardx p { color:var(--dim); font-size:13.5px; }
+  .cardx code { font-family:var(--mono); font-size:12px; color:var(--mint); }
+  .promise { border-left:3px solid var(--mint); padding:2px 0 2px 16px; color:var(--dim); font-size:14.5px; margin-bottom:34px; }
+  .promise b { color:var(--text); }
+  footer { border-top:1px solid var(--line); padding-top:18px; font-size:12.5px; color:var(--dim2); }
+  footer img { vertical-align:-2px; }
+</style></head><body>
+<button class="theme-toggle" aria-label="Switch between light and dark mode" onclick="(function(){var r=document.documentElement,t=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',t);try{localStorage.setItem('checkmcp-theme',t)}catch(e){}})()">
+  <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/></svg>
+  <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+</button>
+<script>try{var t=localStorage.getItem('checkmcp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<main>
+<div class="kicker">checkmcp</div>
+<h1>The crash-test dummy<br>for MCP servers.</h1>
+<p class="sub">Thousands of MCP servers ship every month and almost none are tested. checkmcp is one command that speaks the real protocol at yours and slams every lever <b>before real users do</b>, plus an in-memory harness for the tests only you can write.</p>
+
+<div class="install">
+  <button class="cmd" onclick="navigator.clipboard&&navigator.clipboard.writeText('npx checkmcp server.js');this.querySelector('.p').textContent='copied ';setTimeout(()=>{this.querySelector('.p').textContent='$ '},1200)"><span class="p">$ </span>npx checkmcp server.js</button>
+  <span class="links"><a href="https://github.com/gregkozakiewicz/checkmcp">GitHub</a> · <a href="https://www.npmjs.com/package/checkmcp">npm</a> · MIT · zero dependencies · no telemetry</span>
+</div>
+
+<div class="term"><div class="term-bar"><i></i><i></i><i></i></div>
+<pre>checkmcp v0.1.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
+
+  handshake    <span class="g">3/3</span> passed
+  schemas     <span class="r">41/42</span> passed
+  errors      <span class="g">12/12</span> passed
+  robustness  <span class="r">17/18</span> passed
+
+  <span class="r">✗ schemas</span>: inputSchema of "search_orders" is not valid JSON Schema: unknown type "decimal"
+      <span class="d">schemas/input-schema · spec server/tools#tool</span>
+  <span class="r">✗ robustness</span>: "create_invoice" accepted arguments of the wrong type ({"amount":"not-a-number"})
+      <span class="d">Sent deliberately mistyped values; the server should refuse before its handler runs.</span>
+      <span class="d">robustness/malformed-argument-types · spec server/tools#security-considerations</span>
+  <span class="y">~ schemas</span>: tool "search_orders" declares no description
+      <span class="d">A client model chooses tools by their descriptions. An undescribed tool is invisible at best, misused at worst.</span>
+
+  <span class="w">73/75 passed, 2 failed (1 advisory)</span></pre></div>
+<p class="fine">Every check cites the spec section it enforces. The official reference servers pass with zero failures; does yours?</p>
+
+<div class="grid">
+  <div class="cardx"><h3>The ten-second inspection</h3><p>A battery of conformance checks against the MCP specification: handshake, schemas, errors, robustness. No test files, no API keys, no model. Exit codes made for CI.</p></div>
+  <div class="cardx"><h3>Tests only you can write</h3><p>An in-memory harness and five matchers for vitest and jest. Your real server, the real protocol, the network replaced by a function call: milliseconds per test.<br><code>expect(result).toBeToolSuccess()</code></p></div>
+  <div class="cardx"><h3>Contracts that cannot drift</h3><p>Tool schemas snapshotted to committed files. A careless change fails CI with a sentence a human can judge: <i>"was optional, now required. This breaks every caller that omits it."</i></p></div>
+</div>
+
+<p class="promise"><b>The promise:</b> everything that runs on your machine is free and MIT-licensed, forever. If we ever build a paid product, it will be a hosted service, never a better version of this library.</p>
+
+<footer>Built and designed by <a href="https://gregkozakiewicz.com"><img class="gk gk-dark" src="https://raw.githubusercontent.com/gregkozakiewicz/checkmcp/main/assets/gk-mark-dark.png" height="13" alt="GK mark"><img class="gk gk-light" src="https://raw.githubusercontent.com/gregkozakiewicz/checkmcp/main/assets/gk-mark.png" height="13" alt="GK mark"> Greg Kozakiewicz</a> · <a href="./brand.html">brand and attribution</a> · checkmcp&trade;</footer>
+<style>.gk-light{display:none}html[data-theme="light"] .gk-light{display:inline}html[data-theme="light"] .gk-dark{display:none}</style>
+</main></body></html>

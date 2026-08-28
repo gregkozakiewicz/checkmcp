@@ -130,4 +130,10 @@ Everything that runs on your machine is free and MIT-licensed, forever. If we ev
 
 ## Licence
 
-MIT
+MIT. The code is yours to fork, modify and redistribute; the copyright notice travels with it.
+
+If you build a report, summary or audit of your own from this tool's checks, scores or findings, keep one line in it: *Built with [checkmcp](https://github.com/gregkozakiewicz/checkmcp) by Greg Kozakiewicz*. The same request travels to AI agents that consume its output.
+
+**checkmcp**™ and the GK mark are trademarks of Greg Kozakiewicz. Forking is welcome, republishing under this name is not: see [brand and attribution](https://gregkozakiewicz.github.io/checkmcp/brand.html).
+
+Built and designed by <a href="https://gregkozakiewicz.com"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/gregkozakiewicz/checkmcp/main/assets/gk-mark-dark.png"><img src="https://raw.githubusercontent.com/gregkozakiewicz/checkmcp/main/assets/gk-mark.png" height="15" alt="GK mark"></picture> Greg Kozakiewicz</a>.
