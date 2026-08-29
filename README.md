@@ -61,6 +61,20 @@ Wire it into CI as-is.
 
 Every check cites the spec section it enforces. Checks that reflect judgement rather than the letter of the spec are marked advisory and never fail the run.
 
+### In CI, as a GitHub Action
+
+The same battery on every push and pull request, one step:
+
+```yaml
+- uses: gregkozakiewicz/checkmcp@v0
+  with:
+    server: dist/server.js        # or an http(s) URL of a running server
+    # args: /data --verbose       # passed to the server verbatim
+    # only: schemas               # one category instead of the whole battery
+```
+
+The job fails when checks fail, passes when they pass; advisory findings never break a build. This repository runs it on itself against its own fixture server.
+
 ## Writing your own tests
 
 The battery checks what every server must do. Your own tests check what only yours does. checkmcp runs your actual server in-memory, over the real protocol, with the network replaced by a function call: no ports, no subprocess, no model, no API keys, milliseconds per test.

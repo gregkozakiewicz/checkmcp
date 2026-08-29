@@ -60,7 +60,11 @@ run(`git commit -am "Release v${version}"`);
 // Annotated, and pushed by name: --follow-tags ignores lightweight tags,
 // which once left a release tagged locally with no publish run (v0.1.0).
 run(`git tag -a v${version} -m "v${version}"`);
+// The floating major tag is what action users pin (uses: ...@v0).
+const major = `v${version.split('.')[0] === '0' ? '0' : version.split('.')[0]}`;
+run(`git tag -f ${major}`);
 run(`git push origin main v${version}`);
+run(`git push -f origin ${major}`);
 
 // The repo description leads with the version; keep it honest. Best effort:
 // a missing gh must never fail a release.

@@ -2,6 +2,12 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.3.0] - unreleased
+
+### Added
+
+- A GitHub Action in this repository: `uses: gregkozakiewicz/checkmcp@v0` runs the battery in CI with `server`, `args`, `only`, `version` and `working-directory` inputs. The repository dogfoods it against its own fixture server on every push.
+
 ## [0.2.2] - 2026-08-28
 
 ### Changed

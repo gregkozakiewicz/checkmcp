@@ -1,0 +1,39 @@
+name: checkmcp
+description: Conformance checks for MCP servers. Your server tells every AI what it can do; this makes sure it does.
+author: Greg Kozakiewicz
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  server:
+    description: The server to check. A .js/.mjs file (spawned over stdio) or an http(s) URL of a running server.
+    required: true
+  args:
+    description: Extra arguments passed to the server verbatim, space-separated.
+    required: false
+    default: ''
+  only:
+    description: 'Restrict to one category: handshake, schemas, errors or robustness.'
+    required: false
+    default: ''
+  version:
+    description: checkmcp version to run. Defaults to latest.
+    required: false
+    default: latest
+  working-directory:
+    description: Directory to run in. Defaults to the repository root.
+    required: false
+    default: '.'
+
+runs:
+  using: composite
+  steps:
+    - name: Run checkmcp
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      # inputs.args is split on spaces on purpose: they are separate argv entries.
+      run: |
+        npx --yes "checkmcp@${{ inputs.version }}" \
+          ${{ inputs.only && format('--only {0}', inputs.only) || '' }} \
+          "${{ inputs.server }}" ${{ inputs.args }}

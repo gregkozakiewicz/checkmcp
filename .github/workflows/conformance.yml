@@ -1,0 +1,20 @@
+# Dogfood: the repository's own action checks the fixture server on every
+# push and pull request. If this goes red, either the battery or the action
+# wrapper broke; both are ours.
+name: conformance
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - uses: ./
+        with:
+          server: tests/fixtures/clean-server.mjs

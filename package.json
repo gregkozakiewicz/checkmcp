@@ -53,5 +53,8 @@
   "bin": {
     "checkmcp": "dist/cli.js"
   },
-  "author": "Greg Kozakiewicz"
+  "author": "Greg Kozakiewicz",
+  "dependencies": {
+    "checkmcp": "^0.2.2"
+  }
 }
