@@ -2,6 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/checkmcp?color=2dd4bf&label=npm)](https://www.npmjs.com/package/checkmcp) [![downloads](https://img.shields.io/npm/dm/checkmcp?color=2dd4bf&label=downloads)](https://www.npmjs.com/package/checkmcp) [![Socket](https://badge.socket.dev/npm/package/checkmcp)](https://socket.dev/npm/package/checkmcp) [![license](https://img.shields.io/badge/licence-MIT-blue)](LICENSE) [![zero dependencies](https://img.shields.io/badge/dependencies-0-2dd4bf)](https://www.npmjs.com/package/checkmcp?activeTab=dependencies) [![no telemetry](https://img.shields.io/badge/no-telemetry-2dd4bf)](https://gregkozakiewicz.github.io/checkmcp/)
 
+<sub>Zero runtime dependencies; the one entry on npm's dependencies tab is a peer, the MCP SDK you already have.</sub>
+
 ## Your server tells every AI what it can do. This makes sure it does.
 
 > Testing for [Model Context Protocol](https://modelcontextprotocol.io) servers. An in-memory harness and assertions for your own tests, and one command that checks any server against the spec.
