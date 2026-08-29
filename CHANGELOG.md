@@ -2,7 +2,7 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
-## [0.3.0] - unreleased
+## [0.3.0] - 2026-08-29
 
 ### Added
 
