@@ -6,7 +6,9 @@
 name: publish
 on:
   push:
-    tags: ['v*']
+    # Full version tags only; the floating v0/v1 tag that action users pin
+    # must never trigger a publish.
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
 permissions:
   contents: read
   id-token: write
