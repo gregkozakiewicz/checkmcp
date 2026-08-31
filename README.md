@@ -19,7 +19,7 @@ npx checkmcp server.js
 checkmcp connects to your server, speaks the real protocol at it, and runs a battery of conformance checks against the MCP specification (currently the 2025-11-25 revision, the one the official SDK speaks):
 
 ```text
-checkmcp v0.1.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
+checkmcp v0.4.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
 
   handshake    3/3 passed
   schemas     41/42 passed

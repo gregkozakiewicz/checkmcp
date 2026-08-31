@@ -72,10 +72,10 @@
   <button class="cmd" onclick="navigator.clipboard&&navigator.clipboard.writeText('npx checkmcp server.js');this.querySelector('.p').textContent='copied ';setTimeout(()=>{this.querySelector('.p').textContent='$ '},1200)"><span class="p">$ </span>npx checkmcp server.js</button>
   <span class="links"><a href="https://github.com/gregkozakiewicz/checkmcp">GitHub</a> · <a href="https://www.npmjs.com/package/checkmcp">npm</a> · MIT · zero dependencies · no telemetry</span>
 </div>
-<p class="facts">23 checks · tools, resources and prompts · every check cites the spec (2025-11-25) · the official reference servers pass with 0 failures</p>
+<p class="facts">23 checks · tools, resources and prompts · every check cites the spec (2025-11-25) · SARIF for code scanning · the official reference servers pass with 0 failures</p>
 
 <div class="term"><div class="term-bar"><i></i><i></i><i></i></div>
-<pre>checkmcp v0.1.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
+<pre>checkmcp v0.4.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
 
   handshake    <span class="g">3/3</span> passed
   schemas     <span class="r">41/42</span> passed
@@ -94,7 +94,7 @@
 <p class="fine">Every check cites the spec section it enforces. The official reference servers pass with zero failures; does yours?</p>
 
 <div class="grid">
-  <div class="cardx"><h3>The ten-second inspection</h3><p>A battery of conformance checks over the whole surface: tools, resources and prompts, in four categories. No test files, no API keys, no model. Exit codes made for CI.</p></div>
+  <div class="cardx"><h3>The ten-second inspection</h3><p>A battery of conformance checks over the whole surface: tools, resources and prompts, in four categories. No test files, no API keys, no model. Exit codes made for CI, SARIF for code scanning.</p></div>
   <div class="cardx"><h3>Tests only you can write</h3><p>An in-memory harness and five matchers for vitest and jest. Your real server, the real protocol, the network replaced by a function call: milliseconds per test.<br><code>expect(result).toBeToolSuccess()</code></p></div>
   <div class="cardx"><h3>Contracts that cannot drift</h3><p>Tool schemas snapshotted to committed files. A careless change fails CI with a sentence a human can judge: <i>"was optional, now required. This breaks every caller that omits it."</i></p></div>
 </div>
