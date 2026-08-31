@@ -73,7 +73,7 @@ The same battery on every push and pull request, one step:
     # only: schemas               # one category instead of the whole battery
 ```
 
-The job fails when checks fail, passes when they pass; advisory findings never break a build. This repository runs it on itself against its own fixture server.
+The job fails when checks fail, passes when they pass; advisory findings never break a build. This repository runs it on itself against its own fixture server. Security-conscious teams can pin to an exact commit instead of a version tag: `uses: gregkozakiewicz/checkmcp@<commit-sha>`.
 
 ## Writing your own tests
 
