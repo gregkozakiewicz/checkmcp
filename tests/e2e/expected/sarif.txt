@@ -1,0 +1,270 @@
+exit 0
+---
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "X.Y.Z",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "checkmcp",
+          "version": "X.Y.Z",
+          "informationUri": "https://github.com/gregkozakiewicz/checkmcp",
+          "rules": [
+            {
+              "id": "handshake/server-info",
+              "shortDescription": {
+                "text": "handshake/server-info"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle#initialization",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "handshake/tools-capability",
+              "shortDescription": {
+                "text": "handshake/tools-capability"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#capabilities",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "handshake/declared-lists-answer",
+              "shortDescription": {
+                "text": "handshake/declared-lists-answer"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle#capability-negotiation",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "handshake/ping",
+              "shortDescription": {
+                "text": "handshake/ping"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/ping",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "schemas/tool-name",
+              "shortDescription": {
+                "text": "schemas/tool-name"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#tool-names",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "schemas/tool-description",
+              "shortDescription": {
+                "text": "schemas/tool-description"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#tool",
+              "properties": {
+                "advisory": true
+              }
+            },
+            {
+              "id": "schemas/input-schema",
+              "shortDescription": {
+                "text": "schemas/input-schema"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#tool",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "schemas/output-schema",
+              "shortDescription": {
+                "text": "schemas/output-schema"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#output-schema",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "schemas/output-schema-declared",
+              "shortDescription": {
+                "text": "schemas/output-schema-declared"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#output-schema",
+              "properties": {
+                "advisory": true
+              }
+            },
+            {
+              "id": "errors/unknown-tool",
+              "shortDescription": {
+                "text": "errors/unknown-tool"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#error-handling",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "errors/missing-required-args",
+              "shortDescription": {
+                "text": "errors/missing-required-args"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#security-considerations",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "robustness/malformed-argument-types",
+              "shortDescription": {
+                "text": "robustness/malformed-argument-types"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#security-considerations",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "schemas/resource-fields",
+              "shortDescription": {
+                "text": "schemas/resource-fields"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/resources#resource",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "schemas/resource-template-uris",
+              "shortDescription": {
+                "text": "schemas/resource-template-uris"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/resources#resource-templates",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "schemas/prompt-arguments",
+              "shortDescription": {
+                "text": "schemas/prompt-arguments"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/prompts#prompt",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "errors/unknown-resource",
+              "shortDescription": {
+                "text": "errors/unknown-resource"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/resources#error-handling",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "errors/resource-not-found-code",
+              "shortDescription": {
+                "text": "errors/resource-not-found-code"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/resources#error-handling",
+              "properties": {
+                "advisory": true
+              }
+            },
+            {
+              "id": "errors/unknown-prompt",
+              "shortDescription": {
+                "text": "errors/unknown-prompt"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/prompts#error-handling",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "errors/prompt-missing-required-args",
+              "shortDescription": {
+                "text": "errors/prompt-missing-required-args"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/prompts#error-handling",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "robustness/resources-readable",
+              "shortDescription": {
+                "text": "robustness/resources-readable"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/resources#resource-contents",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "robustness/prompts-render",
+              "shortDescription": {
+                "text": "robustness/prompts-render"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/prompts#promptmessage",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "robustness/bogus-cursor",
+              "shortDescription": {
+                "text": "robustness/bogus-cursor"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/utilities/pagination",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "robustness/survives-the-battery",
+              "shortDescription": {
+                "text": "robustness/survives-the-battery"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/ping",
+              "properties": {
+                "advisory": false
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "errors/resource-not-found-code",
+          "level": "note",
+          "message": {
+            "text": "an unknown resource was refused with code -32602; the spec reserves -32002 for resource-not-found\nClients branch on the code; -32002 tells them the URI, not the server, is at fault."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/fixtures/clean-server.mjs"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

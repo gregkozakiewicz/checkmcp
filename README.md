@@ -55,6 +55,7 @@ npx checkmcp --list                          # every check, with its spec sectio
 | `checkmcp <http(s)://url>` | check a running server over HTTP |
 | `--only <category>` | one of `handshake`, `schemas`, `errors`, `robustness` (before the server) |
 | `--list` | every check, with the spec section it enforces |
+| `--format sarif` | findings on the standard form GitHub code scanning ingests |
 | exit codes | `0` all passed · `1` failures · `2` could not connect |
 
 Wire it into CI as-is.
@@ -74,6 +75,16 @@ The same battery on every push and pull request, one step:
 ```
 
 The job fails when checks fail, passes when they pass; advisory findings never break a build. This repository runs it on itself against its own fixture server. Security-conscious teams can pin to an exact commit instead of a version tag: `uses: gregkozakiewicz/checkmcp@<commit-sha>`.
+
+For findings as pull-request annotations and Security-tab entries, write the report on the standard form and hand it to code scanning:
+
+```yaml
+- run: npx checkmcp --format sarif dist/server.js > checkmcp.sarif
+  continue-on-error: true
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: checkmcp.sarif
+```
 
 ## Writing your own tests
 

@@ -5,6 +5,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { CATEGORIES, listChecks, runBattery, type Category } from './battery.js';
 import { render } from './report.js';
+import { toSarif } from './sarif.js';
 
 const VERSION: string = createRequire(import.meta.url)('../package.json').version;
 
@@ -17,6 +18,8 @@ Usage:
 
 Options:
   --only <category>               one of: ${CATEGORIES.join(', ')}
+  --format <text|sarif>           sarif writes the standard form GitHub code
+                                  scanning ingests; redirect it to a file
 
 checkmcp's own flags go before the server; everything after it is passed
 to the server verbatim: checkmcp --only schemas bin/server.mjs --mcp
@@ -54,6 +57,7 @@ if (args.includes('--list')) {
 // Our flags come before the server; everything after it, flags included,
 // travels to the server verbatim (checkmcp bin/roast.mjs --mcp).
 let only: Category | undefined;
+let format: 'text' | 'sarif' = 'text';
 let target: string | undefined;
 let serverArgs: string[] = [];
 for (let i = 0; i < args.length; i++) {
@@ -63,6 +67,14 @@ for (let i = 0; i < args.length; i++) {
       fail(`--only takes one of: ${CATEGORIES.join(', ')} (got ${JSON.stringify(value ?? '')})`);
     }
     only = value as Category;
+    continue;
+  }
+  if (args[i] === '--format') {
+    const value = args[++i];
+    if (value !== 'text' && value !== 'sarif') {
+      fail(`--format takes text or sarif (got ${JSON.stringify(value ?? '')})`);
+    }
+    format = value;
     continue;
   }
   // A flag this far left is meant for checkmcp, and this is not one of ours.
@@ -108,6 +120,10 @@ try {
 } catch (error) {
   fail(`the battery failed against ${target}: ${(error as Error).message}`);
 }
-console.log(render(report, VERSION));
+console.log(
+  format === 'sarif'
+    ? JSON.stringify(toSarif(report, VERSION, target), null, 2)
+    : render(report, VERSION),
+);
 await client.close();
 process.exit(report.failed > 0 ? 1 : 0);

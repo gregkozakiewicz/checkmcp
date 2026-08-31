@@ -29,7 +29,10 @@ if (!existsSync(CLI)) {
 
 // The version changes every release; the contract is everything else.
 const normalize = (s) =>
-  s.replace(/checkmcp v\d+\.\d+\.\d+/g, 'checkmcp vX').replace(/^\d+\.\d+\.\d+$/gm, 'X.Y.Z');
+  s
+    .replace(/checkmcp v\d+\.\d+\.\d+/g, 'checkmcp vX')
+    .replace(/^\d+\.\d+\.\d+$/gm, 'X.Y.Z')
+    .replace(/"version": "\d+\.\d+\.\d+"/g, '"version": "X.Y.Z"');
 
 const CASES = [
   { name: 'clean', args: ['tests/fixtures/clean-server.mjs'], exit: 0 },
@@ -38,6 +41,7 @@ const CASES = [
   { name: 'sloppy-only-schemas', args: ['--only', 'schemas', 'tests/fixtures/sloppy-server.mjs'], exit: 1 },
   { name: 'list', args: ['--list'], exit: 0 },
   { name: 'version', args: ['--version'], exit: 0 },
+  { name: 'sarif', args: ['--format', 'sarif', 'tests/fixtures/clean-server.mjs'], exit: 0 },
   { name: 'unknown-flag', args: ['--verion'], exit: 2 },
   {
     name: 'unreachable',

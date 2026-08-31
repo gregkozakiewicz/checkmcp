@@ -2,6 +2,12 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.4.0] - 2026-08-31
+
+### Added
+
+- `--format sarif`: the report on the standard form (SARIF 2.1.0) that GitHub code scanning ingests, turning findings into pull-request annotations and Security-tab entries. Advisory findings arrive as notes, failures as errors, and every rule links the spec section it enforces.
+
 ## [0.3.0] - 2026-08-29
 
 ### Added
