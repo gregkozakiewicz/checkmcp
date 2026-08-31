@@ -6,7 +6,7 @@ import type { JsonSchemaType } from '@modelcontextprotocol/sdk/validation/index.
 /** The spec revision this battery's checks were verified against. */
 export const SPEC_VERSION = '2025-11-25';
 
-export const CATEGORIES = ['handshake', 'schemas', 'errors', 'robustness'] as const;
+export const CATEGORIES = ['handshake', 'schemas', 'errors', 'robustness', 'security'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export interface Finding {
@@ -102,6 +102,37 @@ const WRONG: Record<string, unknown> = {
 
 // Letters, digits, underscore, hyphen and dot; 1-128 chars. Spec: Tool Names.
 const NAME_PATTERN = /^[a-zA-Z0-9_.-]{1,128}$/;
+
+/**
+ * Credential signatures precise enough that a match is news, not noise.
+ * Each pattern names its finding; the secret itself is never echoed.
+ */
+const CREDENTIAL_SIGNATURES: [string, RegExp][] = [
+  ['an AWS access key id', /AKIA[0-9A-Z]{16}/],
+  ['a secret key of the sk- family', /\bsk-[A-Za-z0-9_-]{20,}/],
+  ['a GitHub token', /\bgh[pousr]_[A-Za-z0-9]{36,}/],
+  ['a Slack token', /\bxox[baprs]-[A-Za-z0-9-]{10,}/],
+  ['a Google API key', /\bAIza[0-9A-Za-z_-]{35}/],
+  ['a private key block', /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
+  ['a JWT', /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\./],
+];
+
+/**
+ * Phrases with no honest reason to be in a tool description, drawn from
+ * documented tool-poisoning attacks: instructions aimed at the model rather
+ * than descriptions of function.
+ */
+const INJECTION_PHRASES = [
+  'ignore previous instructions',
+  'ignore all previous instructions',
+  'do not tell the user',
+  'without telling the user',
+  'without informing the user',
+  'hide this from the user',
+  'do not mention this',
+  'always use this tool first',
+  'before using any other tool',
+];
 
 const CHECKS: Check[] = [
   {
@@ -604,6 +635,58 @@ const CHECKS: Check[] = [
         }
       }
       return { examined: surfaces.length, failures };
+    },
+  },
+  {
+    id: 'security/credentials-in-metadata',
+    category: 'security',
+    spec: 'server/tools#security-considerations',
+    advisory: false,
+    async run({ tools, resources, prompts }) {
+      const surfaces: [string, unknown][] = [
+        ...tools.map((t): [string, unknown] => [`tool "${t.name}"`, t]),
+        ...(resources ?? []).map((r): [string, unknown] => [`resource "${r.name}"`, r]),
+        ...(prompts ?? []).map((p): [string, unknown] => [`prompt "${p.name}"`, p]),
+      ];
+      const failures = [];
+      for (const [subject, definition] of surfaces) {
+        const text = JSON.stringify(definition);
+        for (const [what, pattern] of CREDENTIAL_SIGNATURES) {
+          if (pattern.test(text)) {
+            failures.push({
+              subject,
+              detail: `${subject} carries what looks like ${what} in its published definition`,
+              advice: 'Every connected client and model can read this. Rotate the credential and load it from the environment.',
+            });
+          }
+        }
+      }
+      return { examined: surfaces.length, failures };
+    },
+  },
+  {
+    id: 'security/injection-in-descriptions',
+    category: 'security',
+    spec: 'server/tools#security-considerations',
+    advisory: true,
+    async run({ tools, prompts }) {
+      const described: [string, string][] = [
+        ...tools.map((t): [string, string] => [`tool "${t.name}"`, t.description ?? '']),
+        ...(prompts ?? []).map((p): [string, string] => [`prompt "${p.name}"`, p.description ?? '']),
+      ];
+      const failures = [];
+      for (const [subject, description] of described) {
+        const lower = description.toLowerCase();
+        const phrase = INJECTION_PHRASES.find((p) => lower.includes(p));
+        if (phrase) {
+          failures.push({
+            subject,
+            detail: `the description of ${subject} instructs the model ("${phrase}") instead of describing function`,
+            advice: 'Descriptions are read as trusted by client models; this is the shape of a tool-poisoning attack.',
+          });
+        }
+      }
+      return { examined: described.length, failures };
     },
   },
   {

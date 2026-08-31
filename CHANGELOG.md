@@ -2,6 +2,12 @@
 
 All notable changes to checkmcp. Format follows [Keep a Changelog](https://keepachangelog.com); versions follow semver.
 
+## [0.5.0] - 2026-08-31
+
+### Added
+
+- A fifth category: security. Deterministic checks over what every connected client and model can read, the published tool, resource and prompt definitions. A credential parked in a schema or description (AWS, sk- family, GitHub, Slack, Google, private key blocks, JWTs) fails the run, named by pattern and never echoed. A description that instructs the model instead of describing function, the shape of a tool-poisoning attack, is flagged as advisory. Runs with the battery and with `--only security`; the official reference servers pass with zero findings.
+
 ## [0.4.0] - 2026-08-31
 
 ### Added

@@ -232,6 +232,26 @@ exit 0
               }
             },
             {
+              "id": "security/credentials-in-metadata",
+              "shortDescription": {
+                "text": "security/credentials-in-metadata"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#security-considerations",
+              "properties": {
+                "advisory": false
+              }
+            },
+            {
+              "id": "security/injection-in-descriptions",
+              "shortDescription": {
+                "text": "security/injection-in-descriptions"
+              },
+              "helpUri": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools#security-considerations",
+              "properties": {
+                "advisory": true
+              }
+            },
+            {
               "id": "robustness/survives-the-battery",
               "shortDescription": {
                 "text": "robustness/survives-the-battery"

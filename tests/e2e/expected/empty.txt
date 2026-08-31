@@ -6,5 +6,6 @@ checkmcp vX · spec 2025-11-25 · empty 1.0.0 · 0 tools found
   schemas     0/0 passed
   errors      1/1 passed
   robustness  2/2 passed
+  security    0/0 passed
 
   6/6 passed, 0 failed (0 advisory)

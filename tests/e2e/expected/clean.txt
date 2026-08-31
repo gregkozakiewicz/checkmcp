@@ -6,9 +6,10 @@ checkmcp vX · spec 2025-11-25 · clean-fixture 1.0.0 · 1 tools found
   schemas     5/5 passed
   errors      5/5 passed
   robustness  7/7 passed
+  security    3/3 passed
 
   ~ errors: an unknown resource was refused with code -32602; the spec reserves -32002 for resource-not-found
       Clients branch on the code; -32002 tells them the URI, not the server, is at fault.
       errors/resource-not-found-code · spec server/resources#error-handling
 
-  23/23 passed, 0 failed (1 advisory)
+  26/26 passed, 0 failed (1 advisory)

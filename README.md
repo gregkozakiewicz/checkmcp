@@ -40,6 +40,8 @@ checkmcp v0.4.0 · spec 2025-11-25 · invoice-server 2.3.0 · 21 tools found
 
 The errors and robustness checks call your tools with deliberately broken arguments. A conformant server refuses them before its handlers run; one that does not will execute handlers on garbage. Point checkmcp at a development instance, not production.
 
+The security page reads what every connected client and model can read: your published tool, resource and prompt definitions. A credential parked in a schema fails the run, named by pattern and never echoed. A description that instructs the model ("always use this tool first", "do not tell the user"), the shape of a tool-poisoning attack, is flagged as advisory. All of it deterministic: no AI judging AI.
+
 Works against a local build or a running server:
 
 ```bash
@@ -53,7 +55,7 @@ npx checkmcp --list                          # every check, with its spec sectio
 |---|---|
 | `checkmcp <server.js> [args...]` | spawn the server over stdio; everything after the file goes to it verbatim |
 | `checkmcp <http(s)://url>` | check a running server over HTTP |
-| `--only <category>` | one of `handshake`, `schemas`, `errors`, `robustness` (before the server) |
+| `--only <category>` | one of `handshake`, `schemas`, `errors`, `robustness`, `security` (before the server) |
 | `--list` | every check, with the spec section it enforces |
 | `--format sarif` | findings on the standard form GitHub code scanning ingests |
 | exit codes | `0` all passed · `1` failures · `2` could not connect |

@@ -22,4 +22,6 @@ errors/prompt-missing-required-args      spec server/prompts#error-handling
 robustness/resources-readable            spec server/resources#resource-contents
 robustness/prompts-render                spec server/prompts#promptmessage
 robustness/bogus-cursor                  spec server/utilities/pagination
+security/credentials-in-metadata         spec server/tools#security-considerations
+security/injection-in-descriptions       spec server/tools#security-considerations (advisory)
 robustness/survives-the-battery          spec basic/utilities/ping

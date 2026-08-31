@@ -1,8 +1,8 @@
 exit 1
 ---
-checkmcp vX · spec 2025-11-25 · sloppy 0.0.1 · 2 tools found
+checkmcp vX · spec 2025-11-25 · sloppy 0.0.1 · 3 tools found
 
-  schemas     5/7 passed
+  schemas     7/9 passed
 
   ✗ schemas: inputSchema of "mystery" is not valid JSON Schema: type must be JSONType or JSONType[]: flavour
       schemas/input-schema · spec server/tools#tool
@@ -11,8 +11,8 @@ checkmcp vX · spec 2025-11-25 · sloppy 0.0.1 · 2 tools found
   ~ schemas: tool "mystery" declares no description
       A client model chooses tools by their descriptions. An undescribed tool is invisible at best, misused at worst.
       schemas/tool-description · spec server/tools#tool
-  ~ schemas: 2 tools declare no output schema ("mystery", "trusting")
+  ~ schemas: 3 tools declare no output schema ("mystery", "leaky", "trusting")
       With outputSchema declared, clients can validate results and type integrations.
       schemas/output-schema-declared · spec server/tools#output-schema
 
-  5/7 passed, 2 failed (3 advisory)
+  7/9 passed, 2 failed (4 advisory)
